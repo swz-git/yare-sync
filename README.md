@@ -12,6 +12,13 @@ Update your yare code easily from node.js.
 
 ```js
 let server = require("yare-sync");
-let result = server.updateCode("console.log('test')");
-console.log(result ? "Updated code!" : "Failed to update code...");
+
+server
+  .updateCode("console.log('test')")
+  .then(() => {
+    console.log("Updated code!");
+  })
+  .catch((e) => {
+    console.error("Failed to update code");
+  });
 ```
