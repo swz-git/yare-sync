@@ -1,6 +1,6 @@
 {
   "name": "yare-sync",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Update your yare code from the commandline ",
   "main": "serverwrapper.js",
   "scripts": {
