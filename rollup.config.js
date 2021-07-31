@@ -17,7 +17,7 @@ export default [
   {
     input: "src/client/index.ts",
     output: {
-      file: "dist/client.js",
+      file: "dist/client.user.js",
       format: "esm",
     },
     plugins: [
