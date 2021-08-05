@@ -145,4 +145,4 @@ function updateCode(code) {
         });
     });
 }
-module.exports = { updateCode, login, getGames, sendCode };
+module.exports = { updateCode, login, getGames, sendCode, verifySession };
