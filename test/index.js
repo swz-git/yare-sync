@@ -1,10 +1,29 @@
-let server = require("../serverwrapper");
+let server = require("../dist/wrappers.js");
 
-server
-  .updateCode("console.log('test')")
-  .then(() => {
-    console.log("Updated code!");
-  })
-  .catch((e) => {
-    console.error("Failed to update code");
-  });
+let username = process.env.USERN;
+let password = process.env.PASSW;
+
+async function main() {
+  console.log("Logging in as", username);
+  let acc = await server.login(username, password);
+
+  if (!acc) return console.log("Login failed");
+
+  console.log("Session id:", acc.session_id);
+
+  let games = await server.getGames(username);
+
+  console.log("Games:", games);
+
+  let successful = await server.sendCode(
+    "console.log('Hello, World!')",
+    games,
+    acc
+  );
+
+  if (successful) {
+    console.log("Uploaded code!");
+  }
+}
+
+main();

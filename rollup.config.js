@@ -6,7 +6,7 @@ import metablock from "rollup-plugin-userscript-metablock";
 
 let terserConfig = {
   format: {
-    comments: false,
+    comments: true,
     semicolons: false,
   },
 };
@@ -49,5 +49,13 @@ export default [
       format: "cjs",
     },
     plugins: [typescript(), terser(terserConfig)],
+  },
+  {
+    input: "src/wrappers/index.ts",
+    output: {
+      file: "dist/wrappers.js",
+      format: "cjs",
+    },
+    plugins: [typescript()],
   },
 ];

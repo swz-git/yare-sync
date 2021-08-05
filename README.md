@@ -5,20 +5,37 @@ Update your yare code easily from node.js.
 ## Setup
 
 - Install node.js
-- Install tampermonkey
-- Install [this](https://raw.githubusercontent.com/swz-gh/yare-sync/main/dist/client.js) userscript
 
 ## Example
 
 ```js
 let server = require("yare-sync");
 
-server
-  .updateCode("console.log('test')")
-  .then(() => {
-    console.log("Updated code!");
-  })
-  .catch((e) => {
-    console.error("Failed to update code");
-  });
+let username = "your-username";
+let password = "VerySecurePassword"; // remember to not store your password in your code
+
+async function main() {
+  console.log("Logging in as", username);
+  let acc = await server.login(username, password);
+
+  if (!acc) return console.log("Login failed");
+
+  console.log("Session id:", acc.session_id);
+
+  let games = await server.getGames(username);
+
+  console.log("Games:", games);
+
+  let successful = await server.sendCode(
+    "console.log('Hello, World!')",
+    games,
+    acc
+  );
+
+  if (successful) {
+    console.log("Uploaded code!");
+  }
+}
+
+main();
 ```
