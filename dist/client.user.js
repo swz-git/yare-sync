@@ -2,7 +2,7 @@
 // @name        yare-sync
 // @description Update your yare code from the commandline
 // @namespace   https://github.com/swz-gh/yare-sync
-// @version     1.0.0
+// @version     1.0.1
 // @author      swz
 // @icon        https://yare.io/favicon.ico
 // @match       https://yare.io/d*/*
