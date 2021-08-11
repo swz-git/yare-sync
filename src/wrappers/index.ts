@@ -3,7 +3,6 @@ import path from "path";
 import WebSocket from "ws";
 import axios from "axios";
 
-const GAMESERVER = "d1";
 const YAREDOMAIN = "yare.io";
 
 interface userAccount {
@@ -25,8 +24,15 @@ async function verifySession(acc: userAccount): Promise<boolean> {
   return req?.data?.username === acc.user_id;
 }
 
-async function getGames(userID: string): Promise<string[]> {
-  let req = await axios.get(`https://${YAREDOMAIN}/active-games/${userID}`);
+interface game {
+  id: string,
+  server: `d${number}`,
+  pl1?: string,
+  pl2?: string
+}
+
+async function getGames(userID: string): Promise<game[]> {
+  let req = await axios.get(`https://${YAREDOMAIN}/active-games/${userID}?v=2`);
   if (req.data.data === "no active games") {
     return [];
   } else {
@@ -36,7 +42,7 @@ async function getGames(userID: string): Promise<string[]> {
 
 async function sendCode(
   code: string,
-  game: string | string[],
+  game: game | game[],
   acc: userAccount
 ): Promise<boolean> {
   // If its multiple games, run them individually
@@ -58,7 +64,7 @@ async function sendCode(
   if (!(await verifySession(acc))) {
     return false;
   }
-  let ws = new WebSocket(`wss://${YAREDOMAIN}/${GAMESERVER}/${game}`, {
+  let ws = new WebSocket(`wss://${YAREDOMAIN}/${game.server}/${game.id}`, {
     headers: {
       "User-Agent": "yare-sync (https://github.com/swz-gh/yare-sync)",
     },

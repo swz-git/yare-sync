@@ -36,7 +36,6 @@ function __awaiter(thisArg, _arguments, P, generator) {
     });
 }
 
-const GAMESERVER = "d1";
 const YAREDOMAIN = "yare.io";
 function verifySession(acc) {
     var _a;
@@ -57,7 +56,7 @@ function verifySession(acc) {
 }
 function getGames(userID) {
     return __awaiter(this, void 0, void 0, function* () {
-        let req = yield axios__default['default'].get(`https://${YAREDOMAIN}/active-games/${userID}`);
+        let req = yield axios__default['default'].get(`https://${YAREDOMAIN}/active-games/${userID}?v=2`);
         if (req.data.data === "no active games") {
             return [];
         }
@@ -85,7 +84,7 @@ function sendCode(code, game, acc) {
         if (!(yield verifySession(acc))) {
             return false;
         }
-        let ws = new WebSocket__default['default'](`wss://${YAREDOMAIN}/${GAMESERVER}/${game}`, {
+        let ws = new WebSocket__default['default'](`wss://${YAREDOMAIN}/${game.server}/${game.id}`, {
             headers: {
                 "User-Agent": "yare-sync (https://github.com/swz-gh/yare-sync)",
             },
