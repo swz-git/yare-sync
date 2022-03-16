@@ -3,7 +3,11 @@ import path from "path";
 import WebSocket from "ws";
 import axios from "axios";
 
-const YAREDOMAIN = "yare.io";
+let YAREDOMAIN = "yare.io";
+
+function changeYareEndpoint(domain: string) {
+  YAREDOMAIN = domain;
+}
 
 interface userAccount {
   user_id: string;
@@ -25,10 +29,10 @@ async function verifySession(acc: userAccount): Promise<boolean> {
 }
 
 interface game {
-  id: string,
-  server: `d${number}`,
-  pl1?: string,
-  pl2?: string
+  id: string;
+  server: `d${number}`;
+  pl1?: string;
+  pl2?: string;
 }
 
 async function getGames(userID: string): Promise<game[]> {
@@ -110,6 +114,50 @@ async function login(username: string, password: string): Promise<userAccount> {
   }
 }
 
+interface module {
+  author: string;
+  client_script_location: string;
+  description: string;
+  module_id: string;
+  name: string;
+  public: number;
+  server_script_location: string;
+  subscribers: string[];
+  type: string;
+}
+
+async function getAvailableModules(username: string): Promise<module[]> {
+  let req = await axios
+    .post(`https://${YAREDOMAIN}/get-available-modules`, {
+      user_name: username ?? "INVALID_USER",
+    })
+    .catch((e) => {
+      throw Error("Couldn't log in");
+    });
+
+  if (req.data?.data === "modules retreived") {
+    return req.data?.stream ?? [];
+  } else {
+    throw Error("Couldn't get available modules");
+  }
+}
+
+async function getActiveModules(username: string): Promise<string[]> {
+  let req = await axios
+    .post(`https://${YAREDOMAIN}/get-active-modules`, {
+      user_name: username ?? "INVALID_USER",
+    })
+    .catch((e) => {
+      throw Error("Couldn't log in");
+    });
+
+  if (req.data?.data === "modules retreived") {
+    return req.data?.active_modules ?? [];
+  } else {
+    throw Error("Couldn't get active modules");
+  }
+}
+
 /** @deprecated since version 2.0 */
 async function updateCode(code: string) {
   return new Promise((res, rej) => {
@@ -125,4 +173,13 @@ async function updateCode(code: string) {
   });
 }
 
-module.exports = { updateCode, login, getGames, sendCode, verifySession };
+module.exports = {
+  updateCode,
+  changeYareEndpoint,
+  login,
+  getGames,
+  sendCode,
+  verifySession,
+  getAvailableModules,
+  getActiveModules,
+};

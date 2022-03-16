@@ -36,12 +36,15 @@ function __awaiter(thisArg, _arguments, P, generator) {
     });
 }
 
-const YAREDOMAIN = "yare.io";
+let YAREDOMAIN = "yare.io";
+function changeYareEndpoint(domain) {
+    YAREDOMAIN = domain;
+}
 function verifySession(acc) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let failed = false;
-        let req = yield axios__default['default']
+        let req = yield axios__default["default"]
             .post(`https://yare.io/session`, {
             user_id: acc.user_id,
             session_id: acc.session_id,
@@ -56,7 +59,7 @@ function verifySession(acc) {
 }
 function getGames(userID) {
     return __awaiter(this, void 0, void 0, function* () {
-        let req = yield axios__default['default'].get(`https://${YAREDOMAIN}/active-games/${userID}?v=2`);
+        let req = yield axios__default["default"].get(`https://${YAREDOMAIN}/active-games/${userID}?v=2`);
         if (req.data.data === "no active games") {
             return [];
         }
@@ -84,7 +87,7 @@ function sendCode(code, game, acc) {
         if (!(yield verifySession(acc))) {
             return false;
         }
-        let ws = new WebSocket__default['default'](`wss://${YAREDOMAIN}/${game.server}/${game.id}`, {
+        let ws = new WebSocket__default["default"](`wss://${YAREDOMAIN}/${game.server}/${game.id}`, {
             headers: {
                 "User-Agent": "yare-sync (https://github.com/swz-gh/yare-sync)",
             },
@@ -110,7 +113,7 @@ function sendCode(code, game, acc) {
 function login(username, password) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        let req = yield axios__default['default']
+        let req = yield axios__default["default"]
             .post(`https://${YAREDOMAIN}/validate`, {
             user_name: username !== null && username !== void 0 ? username : "INVALID_USER",
             password,
@@ -129,11 +132,47 @@ function login(username, password) {
         }
     });
 }
+function getAvailableModules(username) {
+    var _a, _b, _c;
+    return __awaiter(this, void 0, void 0, function* () {
+        let req = yield axios__default["default"]
+            .post(`https://${YAREDOMAIN}/get-available-modules`, {
+            user_name: username !== null && username !== void 0 ? username : "INVALID_USER",
+        })
+            .catch((e) => {
+            throw Error("Couldn't log in");
+        });
+        if (((_a = req.data) === null || _a === void 0 ? void 0 : _a.data) === "modules retreived") {
+            return (_c = (_b = req.data) === null || _b === void 0 ? void 0 : _b.stream) !== null && _c !== void 0 ? _c : [];
+        }
+        else {
+            throw Error("Couldn't get available modules");
+        }
+    });
+}
+function getActiveModules(username) {
+    var _a, _b, _c;
+    return __awaiter(this, void 0, void 0, function* () {
+        let req = yield axios__default["default"]
+            .post(`https://${YAREDOMAIN}/get-active-modules`, {
+            user_name: username !== null && username !== void 0 ? username : "INVALID_USER",
+        })
+            .catch((e) => {
+            throw Error("Couldn't log in");
+        });
+        if (((_a = req.data) === null || _a === void 0 ? void 0 : _a.data) === "modules retreived") {
+            return (_c = (_b = req.data) === null || _b === void 0 ? void 0 : _b.active_modules) !== null && _c !== void 0 ? _c : [];
+        }
+        else {
+            throw Error("Couldn't get active modules");
+        }
+    });
+}
 /** @deprecated since version 2.0 */
 function updateCode(code) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((res, rej) => {
-            let fpath = path__default['default'].join(path__default['default'].dirname(__filename), "../dist/server.js ");
+            let fpath = path__default["default"].join(path__default["default"].dirname(__filename), "../dist/server.js ");
             let resp = child_process.execSync(`node ${fpath} ${Buffer.from(code, "utf-8").toString("base64")}`).toString();
             if (resp.includes("Success!")) {
                 res(true);
@@ -144,4 +183,13 @@ function updateCode(code) {
         });
     });
 }
-module.exports = { updateCode, login, getGames, sendCode, verifySession };
+module.exports = {
+    updateCode,
+    changeYareEndpoint,
+    login,
+    getGames,
+    sendCode,
+    verifySession,
+    getAvailableModules,
+    getActiveModules,
+};
